@@ -1,0 +1,146 @@
+{
+  "scenarios": {
+    "retail": {
+      "id": "retail",
+      "name": "Retail Purchase",
+      "description": "Standard daily consumer transaction (e.g., grocery shopping or restaurant bill). Focuses on low ticket size and high merchant volume.",
+      "default_amount": 35.0,
+      "card_rail": {
+        "name": "Card Rail (Visa/Mastercard)",
+        "intermediaries": ["Consumer", "Payment Gateway", "Acquirer / Processor", "Card Network (Visa/MC)", "Issuing Bank", "Merchant"],
+        "finality_time_seconds": 172800,
+        "finality_time_display": "2 Days (48 Hours)",
+        "fee_structure": {
+          "interchange_pct": 1.80,
+          "network_pct": 0.15,
+          "acquirer_pct": 0.35,
+          "flat_fee": 0.10
+        },
+        "counterparty_risk": "High (Chargebacks possible up to 90-120 days, high fraud risk, rolling reserves required for merchants)",
+        "governance": "Centralized under Card Schemes & Clearing Banks"
+      },
+      "on_chain_rail": {
+        "name": "On-Chain (Bitcoin)",
+        "intermediaries": ["Consumer (Wallet)", "Bitcoin Network (Miners/Nodes)", "Merchant (Wallet)"],
+        "finality_time_seconds": 3600,
+        "finality_time_display": "1 Hour (6 Confirmations)",
+        "fee_structure": {
+          "sat_per_vbyte": 25,
+          "tx_size_vbytes": 140
+        },
+        "counterparty_risk": "Zero (Cryptographically secured, irreversible settlement, no chargebacks or funds freezing)",
+        "governance": "Decentralized (Consensus-based protocol, miners, and node operators)"
+      }
+    },
+    "b2b": {
+      "id": "b2b",
+      "name": "B2B Wholesale Payment",
+      "description": "Corporate settlement for raw materials or services. Characterized by very high transaction volume values and strict reconciliation requirements.",
+      "default_amount": 12500.0,
+      "card_rail": {
+        "name": "Card Rail (Commercial Card)",
+        "intermediaries": ["Corporate Buyer", "Acquiring Bank", "Card Network", "Issuing Bank", "Corporate Supplier"],
+        "finality_time_seconds": 259200,
+        "finality_time_display": "3 Days (72 Hours)",
+        "fee_structure": {
+          "interchange_pct": 2.50,
+          "network_pct": 0.10,
+          "acquirer_pct": 0.20,
+          "flat_fee": 1.50
+        },
+        "counterparty_risk": "Medium (Lower fraud rates than retail, but high dispute value risk)",
+        "governance": "Centralized commercial credit systems"
+      },
+      "on_chain_rail": {
+        "name": "On-Chain (Bitcoin)",
+        "intermediaries": ["Corporate Buyer (Wallet)", "Bitcoin Network (Miners/Nodes)", "Corporate Supplier (Wallet)"],
+        "finality_time_seconds": 3600,
+        "finality_time_display": "1 Hour (6 Confirmations)",
+        "fee_structure": {
+          "sat_per_vbyte": 25,
+          "tx_size_vbytes": 140
+        },
+        "counterparty_risk": "Zero (Irreversible cryptographic settlement, proof of payment verified on public ledger)",
+        "governance": "Decentralized (Consensus-based protocol)"
+      }
+    },
+    "cross_border": {
+      "id": "cross_border",
+      "name": "Cross-Border Remittance",
+      "description": "International funds transfer crossing regulatory jurisdictions, requiring currency conversion and correspondent banking routing.",
+      "default_amount": 450.0,
+      "card_rail": {
+        "name": "Card Rail / SWIFT / Correspondent",
+        "intermediaries": ["Sender", "Sending Bank", "Correspondent Bank A", "Correspondent Bank B", "Receiving Bank", "Receiver"],
+        "finality_time_seconds": 432000,
+        "finality_time_display": "5 Days (120 Hours)",
+        "fee_structure": {
+          "interchange_pct": 3.00,
+          "network_pct": 0.25,
+          "acquirer_pct": 0.50,
+          "fx_markup_pct": 2.50,
+          "flat_fee": 15.00
+        },
+        "counterparty_risk": "High (Multi-jurisdictional compliance, routing delays, FX slippage, clearing house risk)",
+        "governance": "Multi-bank clearing systems, SWIFT, and central bank rails (Fedwire, TARGET2)"
+      },
+      "on_chain_rail": {
+        "name": "On-Chain (Bitcoin)",
+        "intermediaries": ["Sender (Wallet)", "Bitcoin Network (Miners/Nodes)", "Receiver (Wallet)"],
+        "finality_time_seconds": 3600,
+        "finality_time_display": "1 Hour (6 Confirmations)",
+        "fee_structure": {
+          "sat_per_vbyte": 25,
+          "tx_size_vbytes": 140
+        },
+        "counterparty_risk": "Zero (Border-free network, direct wallet-to-wallet settlement, zero clearing risk)",
+        "governance": "Decentralized (Global consensus protocol)"
+      }
+    },
+    "micropayment": {
+      "id": "micropayment",
+      "name": "Micropayment / Pay-Per-Article",
+      "description": "Sub-dollar transaction for digital content, API calls, or pay-per-use services, where traditional fees make card rails cost-prohibitive.",
+      "default_amount": 0.75,
+      "card_rail": {
+        "name": "Card Rail (Visa/Mastercard)",
+        "intermediaries": ["Consumer", "Payment Gateway", "Acquirer", "Network", "Issuer", "Content Publisher"],
+        "finality_time_seconds": 172800,
+        "finality_time_display": "2 Days (48 Hours)",
+        "fee_structure": {
+          "interchange_pct": 1.80,
+          "network_pct": 0.15,
+          "acquirer_pct": 0.35,
+          "flat_fee": 0.30
+        },
+        "counterparty_risk": "Extremely High (Micropayments are often unprofitable if chargebacks or dispute fees of $15+ occur)",
+        "governance": "Centralized retail network"
+      },
+      "on_chain_rail": {
+        "name": "On-Chain (Bitcoin)",
+        "intermediaries": ["Consumer (Wallet)", "Bitcoin Network (Miners/Nodes)", "Publisher (Wallet)"],
+        "finality_time_seconds": 3600,
+        "finality_time_display": "1 Hour (6 Confirmations)",
+        "fee_structure": {
+          "sat_per_vbyte": 25,
+          "tx_size_vbytes": 140
+        },
+        "counterparty_risk": "Zero (Irreversible micro-settlement on-chain, though Lightning is recommended for lower sizes)",
+        "governance": "Decentralized (Consensus-based protocol)"
+      }
+    }
+  },
+  "fed_study_context": {
+    "title": "Federal Reserve Payments Study & BIS CPMI Data",
+    "description": "Baseline stats from the Fed Payments Study indicate the average card transaction fee is 2.2% of the value (including interchange and processing). Across all card payments, check clearings, and ACH transfers, the card network incurs the highest fee-to-value ratio, while ACH represents the lowest. Average B2B card fees exceed retail credit card interchange due to enhanced data processing requirements.",
+    "average_card_fraud_rate_bps": 12.5,
+    "average_chargeback_rate_pct": 0.15,
+    "total_us_card_volume_trillion": 9.4,
+    "average_settlement_duration_hours": {
+      "card": 48.0,
+      "ach": 24.0,
+      "wire": 2.0,
+      "bitcoin": 1.0
+    }
+  }
+}
