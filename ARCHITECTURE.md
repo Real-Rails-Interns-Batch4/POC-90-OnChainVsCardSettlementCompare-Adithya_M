@@ -8,6 +8,8 @@ This document provides a technical summary of the architecture of the **On-Chain
 
 The platform operates on a decoupled client-server architecture with an integrated **Dual-Engine failover mechanism** to ensure maximum reliability and availability.
 
+*(Visualized in the full dashboard interface: [Dashboard View](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Screenshots/Dashboard_View.png))*
+
 ```mermaid
 graph TD
     User([User Interface / Browser]) <--> |HTTP / JSON / CSV| Frontend[Next.js Frontend Client]
@@ -75,6 +77,7 @@ The frontend is constructed using **Next.js** (v16.2.7), utilizing **React 19** 
     *   **Card Network Path**: Generates interactive nodes representing the complex, multi-party chain (Consumer, Payment Gateway, Acquirer, Card Scheme/Network, Issuing Bank, Merchant).
     *   **On-Chain Path**: Generates a simplified, direct sovereign route (Sender, Bitcoin Miners/Network, Receiver).
     *   Maintains layout coordinate rules to render responsive, clean diagrams for varying browser viewport sizes.
+    *   *(Graph visual output reference: [Intermediary Flow Route Visual](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Screenshots/Inetermediary_Count_and_Transition_Routing_Flow.png))*
 
 ---
 
@@ -199,3 +202,10 @@ Each comparison scenario is defined by the following schema structure:
 1.  **Dual calculations core**: The system has a mirrored calculations pipeline (FastAPI/Pandas on the backend vs. Vanilla JavaScript on the frontend). This prevents client dashboards from breaking if servers crash.
 2.  **API Timeout Limits**: Prevents the backend from being blocked by slow third-party API networks. If a fetch request takes longer than 3 seconds, fallback values are utilized instantly.
 3.  **CORS Security Controls**: Configured explicitly on FastAPI middleware to allow safe cross-origin resource requests for client components while avoiding data leaking or blocked client requests.
+
+---
+
+## 🎥 Architectural Walkthrough Demo
+
+A video walkthrough demonstrating system load, backend request routing, data recalculations upon custom override updates, and the local calculations failover engine in action can be viewed here:
+[Play Walkthrough Demo Video](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Video(Demo)/-OnChain_Vs_Card_Settlement_Compare_DemoVideo.mp4)
