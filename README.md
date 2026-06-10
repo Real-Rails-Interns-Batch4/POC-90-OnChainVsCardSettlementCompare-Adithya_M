@@ -13,6 +13,10 @@ This Proof of Concept (POC) utilizes a Python FastAPI backend for live network p
     2.  **B2B Wholesale Payment**: Large ticket size (e.g., $12,500.00) showing how volume affects cost-effectiveness.
     3.  **Cross-Border Remittance**: High FX markups and correspondent bank routing compared to border-free blockchain settlement.
     4.  **Micropayment**: Sub-dollar transaction (e.g., $0.75) illustrating where credit card flat fees are cost-prohibitive and proposing a Layer-2 Lightning Network alternative.
+*   **Interactive Scenario Ledger Filters**: Quick-filter the comparison ledger using toggle chips for transaction size ranges (Micro, Retail, B2B) and cost-efficiency rail leaders.
+*   **Interactive Context Tooltips**: Informative hover triggers providing detailed financial definitions for card fee breakdowns (interchange, acquirer processor margins, network assessments, flat gateway costs) and Bitcoin dynamics (gas rates, transaction weight sizes, miner fee calculations).
+*   **Synthetic vs Live Data Origin Labeling**: Explicit badging indicating where empirical live rates are used (BTC price and priority fee) versus synthetic models (Federal Reserve card clearing estimates, standardized SegWit vBytes weights).
+*   **External mempool.space Attribution**: Integrated linking and attributions directly pointing to the live [mempool.space](https://mempool.space) network state.
 *   **Live Blockchain Metrics Integration**: Connects to the live [mempool.space API](https://mempool.space) to fetch recommended gas fees (sat/vB) and the [blockchain.info ticker](https://blockchain.info/ticker) for real-time BTC/USD exchange rates.
 *   **Extreme Durability Failover (Local Calculations)**: Built-in frontend redundancy. If the FastAPI backend is offline or unreachable, the frontend automatically switches to a high-fidelity client-side calculations engine using offline parameters, ensuring 100% dashboard uptime.
 *   **Interactive Parameters Panel**: Override transaction amounts and sat/vB fee rates in real time to instantly see the updated fee rates and cost comparisons.
@@ -21,6 +25,30 @@ This Proof of Concept (POC) utilizes a Python FastAPI backend for live network p
 *   **Data Export (CSV)**: Export the comparison matrices as a downloadable CSV from either the backend API or directly via client-side generation.
 
 ---
+
+## 📁 Project Structure
+
+```text
+POC-90-OnChainVsCardSettlementCompare-Adithya_M/
+├── .gitignore             # Workspace-level git exclusions (venv, caches, builds)
+├── backend/
+│   ├── main.py            # FastAPI entry point & API endpoints
+│   ├── mock_data.json     # Scenario structures, fees, and Fed context
+│   ├── requirements.txt   # Python backend dependencies
+│   ├── test_api.py        # Local API verification scripts
+│   └── venv/              # Python virtual environment (ignored)
+├── frontend/
+│   ├── package.json       # Node scripts & dependencies (React 19, Next.js 16)
+│   ├── postcss.config.mjs # CSS post-processing rules
+│   ├── tsconfig.json      # TypeScript compiler configurations
+│   ├── public/            # Core images & favicons
+│   └── src/
+│       └── app/
+│           ├── globals.css # Custom themes & Tailwind imports
+│           ├── layout.tsx  # Next.js root layout
+│           └── page.tsx    # Dashboard core UI (ReactFlow, Fetchers, calculations)
+└── README.md              # Project documentation (this file)
+```
 
 ## 📸 Visual Previews & Demo Walkthrough
 
@@ -70,33 +98,6 @@ A complete walkthrough video of the platform, showing all features, live mempool
 ### Database
 *   **Type**: File-based NoSQL Mock Database
 *   **File**: `backend/mock_data.json`
-*   *Note: This architecture allows rapid prototyping and zero-dependency database installation, while maintaining scenario consistency.*
-
----
-
-## 📁 Project Structure
-
-```text
-POC-90-OnChainVsCardSettlementCompare-Adithya_M/
-├── backend/
-│   ├── main.py            # FastAPI entry point & API endpoints
-│   ├── mock_data.json     # Scenario structures, fees, and Fed context
-│   ├── requirements.txt   # Python backend dependencies
-│   ├── test_api.py        # Local API verification scripts
-│   └── venv/              # Python virtual environment (ignored)
-├── frontend/
-│   ├── package.json       # Node scripts & dependencies (React 19, Next.js 16)
-│   ├── postcss.config.mjs # CSS post-processing rules
-│   ├── tsconfig.json      # TypeScript compiler configurations
-│   ├── public/            # Core images & favicons
-│   └── src/
-│       └── app/
-│           ├── globals.css # Custom themes & Tailwind imports
-│           ├── layout.tsx  # Next.js root layout
-│           └── page.tsx    # Dashboard core UI (ReactFlow, Fetchers, calculations)
-└── README.md              # Project documentation (this file)
-```
-
 ---
 
 ## ⚙️ Setup and Installation
