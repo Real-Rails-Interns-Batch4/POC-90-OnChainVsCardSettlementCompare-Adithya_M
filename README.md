@@ -54,28 +54,28 @@ POC-90-OnChainVsCardSettlementCompare-Adithya_M/
 
 ### 🖥️ Complete Dashboard Overview
 Below is the full dashboard view showcasing the side-by-side transaction cost metrics and clearing parameters:
-![Dashboard View](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Screenshots/Dashboard_View.png)
+![Dashboard View](./Screenshots/Dashboard_View.png)
 
 ### 👥 Intermediary Flow Route (ReactFlow Visualizer)
 Interactive visual graph showing the 6 complex legacy rails vs. 3 peer-to-peer cryptocurrency nodes:
-![Intermediary Flow Graph](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Screenshots/Inetermediary_Count_and_Transition_Routing_Flow.png)
+![Intermediary Flow Graph](./Screenshots/Inetermediary_Count_and_Transition_Routing_Flow.png)
 
 ### 📊 Metric Analysis Views
 Compare Card rails side-by-side with On-Chain metrics:
-![Comparison Overview](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Screenshots/On_Chain_VS_Card_Settlement_Compare.png)
+![Comparison Overview](./Screenshots/On_Chain_VS_Card_Settlement_Compare.png)
 
 ### 📈 Settlement Finality & Comparison Ledger
 Logarithmic time comparison of settlement speeds along with comparisons ledger:
-![Settlement Finality Comparison](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Screenshots/Settlement_Finality_Timeline_Comparison.png)
-![Scenario Comparison Ledger](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Screenshots/Scenario_Comparison_Ledger.png)
+![Settlement Finality Comparison](./Screenshots/Settlement_Finality_Timeline_Comparison.png)
+![Scenario Comparison Ledger](./Screenshots/Scenario_Comparison_Ledger.png)
 
 ### ⚙️ Real-Time Intelligence & Parameters Override
 Detailed metrics and live override forms on the sidebar:
-![Real-Time Intelligence Sidebar](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Screenshots/Intelligence_Sidebar.png)
+![Real-Time Intelligence Sidebar](./Screenshots/Intelligence_Sidebar.png)
 
 ### 🎥 Demo Video
 A complete walkthrough video of the platform, showing all features, live mempool querying, parameter overrides, and CSV download functionality:
-[Play Walkthrough Demo Video](file:///c:/Users/Adithya%20M/Desktop/new/POC-90-OnChainVsCardSettlementCompare-Adithya_M/POC-90-OnChainVsCardSettlementCompare-Adithya_M/Video(Demo)/-OnChain_Vs_Card_Settlement_Compare_DemoVideo.mp4)
+[Play Walkthrough Demo Video](./Video(Demo)/-OnChain_Vs_Card_Settlement_Compare_DemoVideo.mp4)
 
 ---
 
