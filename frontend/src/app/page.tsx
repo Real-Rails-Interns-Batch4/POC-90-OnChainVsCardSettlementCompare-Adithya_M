@@ -21,6 +21,52 @@ import {
 import ReactFlow, { Background, Controls, Edge, Node } from "reactflow";
 import "reactflow/dist/style.css";
 
+// --- CUSTOM TOOLTIP & BADGE COMPONENTS ---
+function InfoTooltip({ content }: { content: string }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <span 
+      className="relative inline-block ml-1 cursor-help group select-none align-middle"
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+    >
+      <HelpCircle className="h-3.5 w-3.5 text-gray-500 hover:text-[#38BDF8] transition-colors inline-block" />
+      {visible && (
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-[#0B1117] border border-[#38BDF8] text-[10px] text-gray-300 rounded shadow-[0_4px_12px_rgba(0,0,0,0.85)] backdrop-blur-md z-50 normal-case font-normal leading-normal text-left whitespace-normal block pointer-events-none transition-all duration-200">
+          {content}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function LiveBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-800 text-[8px] text-emerald-400 font-mono font-bold tracking-wider uppercase select-none">
+      <span className="w-1 h-1 bg-emerald-400 rounded-full animate-pulse"></span>
+      Live Data
+    </span>
+  );
+}
+
+function SyntheticBadge({ tooltip }: { tooltip?: string }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <span 
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-950/60 border border-amber-900/80 text-[8px] text-amber-400 font-mono font-bold tracking-wider uppercase select-none relative cursor-help"
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+    >
+      Synthetic
+      {visible && tooltip && (
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2.5 bg-[#0B1117] border border-amber-500 text-[9px] text-gray-300 rounded shadow-md z-50 normal-case font-normal leading-normal text-left whitespace-normal pointer-events-none">
+          {tooltip}
+        </span>
+      )}
+    </span>
+  );
+}
+
 // --- LOCAL FALLBACK DATA & CALCULATIONS (Extreme Durability Guardrail) ---
 const LOCAL_SCENARIOS: Record<string, any> = {
   retail: {
@@ -226,6 +272,10 @@ export default function Home() {
   const [customAmount, setCustomAmount] = useState("");
   const [customSatRate, setCustomSatRate] = useState("");
   const [isLiveBackend, setIsLiveBackend] = useState(false);
+  
+  // Filtering States
+  const [sizeFilter, setSizeFilter] = useState<"all" | "micro" | "retail" | "b2b">("all");
+  const [railFilter, setRailFilter] = useState<"all" | "crypto" | "card">("all");
   
   // Real-time API States
   const [liveBtcStats, setLiveBtcStats] = useState<{ sat_per_vbyte: number; btc_price_usd: number; is_live: boolean } | null>(null);
@@ -435,24 +485,48 @@ export default function Home() {
           
           {/* Status Indicators */}
           <div className="flex flex-wrap items-center gap-3">
-
             {/* Live Bitcoin network metrics indicator */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-[#1F2937] bg-[#0B1117] text-xs font-mono text-gray-400">
               <Globe className="h-3 w-3 text-[#38BDF8]" />
               <span>BTC PRICE: ${data.btc_price.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
             </div>
+            
+            {liveBtcStats?.is_live && (
+              <a 
+                href="https://mempool.space" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-[#1F2937] hover:border-cyan-500 bg-[#0B1117] text-xs font-mono text-[#38BDF8] transition-colors"
+              >
+                <span className="inline-block w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
+                <span>MEMPOOL FEE: {liveBtcStats.sat_per_vbyte} sat/vB</span>
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Data Origin Legend */}
+        <div className="flex flex-wrap items-center gap-4 px-4 py-2.5 rounded-lg border border-[#1F2937]/50 bg-[#0B1117]/40 text-xs font-mono">
+          <span className="text-gray-400 font-semibold">Data Origin Legend:</span>
+          <div className="flex items-center gap-1.5">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981]"></span>
+            <span className="text-gray-200">Live Empirics (API Feed)</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_#f59e0b]"></span>
+            <span className="text-gray-200">Synthetic Projections (Calibrated Models)</span>
           </div>
         </div>
 
         {/* SIDE-BY-SIDE COMPARE PANEL */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Card Settlement Card */}
-          <div className="rounded-lg border border-[#1F2937] bg-[#0B1117] p-5 flex flex-col justify-between hover:border-indigo-500/30 transition-all">
+          <div className="rounded-lg border border-[#1F2937] bg-[#0B1117] p-5 flex flex-col justify-between hover:border-indigo-500/30 transition-all relative">
             <div>
               <div className="flex justify-between items-start mb-4">
-                <span className="text-xs font-mono text-gray-500 uppercase tracking-widest">Card Network</span>
-                <span className="px-2 py-0.5 bg-indigo-950/50 border border-indigo-800 text-indigo-400 rounded text-[10px] font-mono">
-                  Legacy / Institutional
+                <span className="text-xs font-mono text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
+                  <span>Card Network</span>
+                  <SyntheticBadge tooltip="Interchange structure, network processing rates, and clearing timelines are simulated models." />
                 </span>
               </div>
               <h2 className="text-lg font-bold text-white mb-2">{data.card_rail.name}</h2>
@@ -466,25 +540,25 @@ export default function Home() {
               {/* Fee breakdown list */}
               <div className="mt-4 space-y-2 text-xs font-mono border-t border-gray-800/50 pt-3 text-gray-400">
                 <div className="flex justify-between">
-                  <span>Interchange Fee (Issuer)</span>
+                  <span>Interchange Fee (Issuer) <InfoTooltip content="The base processing interchange percentage fee paid to the customer's card-issuing bank." /></span>
                   <span className="text-gray-200">${data.card_rail.interchange_fee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Acquirer/Processor Fee</span>
+                  <span>Acquirer/Processor Fee <InfoTooltip content="A standard service processing fee charged by the merchant's acquiring bank." /></span>
                   <span className="text-gray-200">${data.card_rail.acquirer_fee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Network Assessment Fee</span>
+                  <span>Network Assessment Fee <InfoTooltip content="Assessment charges collected directly by Visa or Mastercard for transaction routing." /></span>
                   <span className="text-gray-200">${data.card_rail.network_fee.toFixed(2)}</span>
                 </div>
                 {data.card_rail.fx_fee > 0 && (
                   <div className="flex justify-between text-indigo-300">
-                    <span>FX Markup & Conversion</span>
+                    <span>FX Markup & Conversion <InfoTooltip content="Foreign exchange spread conversion fee assessed on cross-border payments." /></span>
                     <span>${data.card_rail.fx_fee.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span>Flat Gateway Transaction Fee</span>
+                  <span>Flat Gateway Transaction Fee <InfoTooltip content="A flat per-transaction fee charged by the online payment gateway." /></span>
                   <span className="text-gray-200">${data.card_rail.flat_fee.toFixed(2)}</span>
                 </div>
               </div>
@@ -494,14 +568,14 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <Clock className="h-4.5 w-4.5 text-indigo-400 flex-shrink-0" />
                 <div>
-                  <span className="text-gray-400">Settlement Speed: </span>
+                  <span className="text-gray-400">Settlement Speed: <InfoTooltip content="Standard clearing delays before funds are fully credited to merchant accounts." /></span>
                   <strong className="text-white">{data.card_rail.finality_time_display}</strong>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <ShieldAlert className="h-4.5 w-4.5 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-gray-400">Counterparty Risk: </span>
+                  <span className="text-gray-400">Counterparty Risk: <InfoTooltip content="Mercantile vulnerability to credit reversals and rolling reserves under legacy terms." /></span>
                   <span className="text-gray-200">{data.card_rail.counterparty_risk}</span>
                 </div>
               </div>
@@ -515,9 +589,9 @@ export default function Home() {
             
             <div>
               <div className="flex justify-between items-start mb-4">
-                <span className="text-xs font-mono text-[#38BDF8] uppercase tracking-widest">On-Chain Protocol</span>
-                <span className="px-2 py-0.5 bg-cyan-950/50 border border-cyan-800 text-[#38BDF8] rounded text-[10px] font-mono">
-                  Sovereign / Cryptographic
+                <span className="text-xs font-mono text-[#38BDF8] uppercase tracking-widest flex items-center gap-1.5">
+                  <span>On-Chain Protocol</span>
+                  {isLiveBackend && data.is_live_data ? <LiveBadge /> : <SyntheticBadge tooltip="Falling back to local simulated price and congestion rates." />}
                 </span>
               </div>
               <h2 className="text-lg font-bold text-white mb-2">{data.on_chain_rail.name}</h2>
@@ -531,19 +605,22 @@ export default function Home() {
               {/* Bitcoin fee dynamics */}
               <div className="mt-4 space-y-2 text-xs font-mono border-t border-gray-800/50 pt-3 text-gray-400">
                 <div className="flex justify-between">
-                  <span>Network Gas Rate</span>
+                  <span>Network Gas Rate <InfoTooltip content="Mining priority fee density (satoshis per virtual byte) determined by direct live network block congestion." /></span>
                   <span className="text-gray-200">{data.on_chain_rail.sat_rate} sat/vB</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Average Transaction Weight</span>
-                  <span className="text-gray-200">{data.on_chain_rail.tx_size_vbytes} vBytes</span>
+                  <span>Average Transaction Weight <InfoTooltip content="Satoshi space footprint of the cryptographic inputs & outputs (vBytes) modeled as standard segwit/taproot weight." /></span>
+                  <span className="text-gray-200 flex items-center gap-1">
+                    {data.on_chain_rail.tx_size_vbytes} vBytes
+                    <SyntheticBadge tooltip="Calibrated transaction size based on standard single-signature input/output model." />
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Total Mining Fee (Sats)</span>
+                  <span>Total Mining Fee (Sats) <InfoTooltip content="Satoshi fee density multiplied by byte weight. Paid directly to miners, independent of USD transaction amount." /></span>
                   <span className="text-gray-200">{data.on_chain_rail.total_sats.toLocaleString()} Sats</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Base Fee Model</span>
+                  <span>Base Fee Model <InfoTooltip content="Unlike standard cards, Bitcoin blocks verify size, not value. High value payouts pay matching fees to low value payouts." /></span>
                   <span className="text-gray-200">Independent of value</span>
                 </div>
               </div>
@@ -553,14 +630,14 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <Clock className="h-4.5 w-4.5 text-[#38BDF8] flex-shrink-0" />
                 <div>
-                  <span className="text-gray-400">Settlement Speed: </span>
+                  <span className="text-gray-400">Settlement Speed: <InfoTooltip content="Average consensus settlement depth (6 confirmations) on the main ledger." /></span>
                   <strong className="text-white">{data.on_chain_rail.finality_time_display}</strong>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-4.5 w-4.5 text-emerald-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-gray-400">Counterparty Risk: </span>
+                  <span className="text-gray-400">Counterparty Risk: <InfoTooltip content="Bitcoin settlements are absolute and final after block addition. No chargeback dispute structures exist." /></span>
                   <span className="text-gray-200">{data.on_chain_rail.counterparty_risk}</span>
                 </div>
               </div>
@@ -584,8 +661,8 @@ export default function Home() {
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
                   <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                    <Zap className="h-3.5 w-3.5 fill-current" />
-                    <span>Bitcoin Lightning Network (L2 alternative)</span>
+                    <Zap className="h-3.5 w-3.5 fill-current animate-pulse" />
+                    <span>Bitcoin Lightning Network (L2 alternative) <InfoTooltip content="Off-chain routing network allowing micro-payments with near-zero base cost and instant settlement." /></span>
                   </span>
                   <span className="text-gray-300">Instant (&lt; 1 second)</span>
                 </div>
@@ -598,7 +675,7 @@ export default function Home() {
             {/* Bitcoin On-Chain */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-[#38BDF8] font-semibold">Bitcoin On-Chain (Settlement depth: 6 Blocks)</span>
+                <span className="text-[#38BDF8] font-semibold">Bitcoin On-Chain (Settlement depth: 6 Blocks) <InfoTooltip content="Security finality is verified after 6 blocks are mined, cryptographically securing transaction history." /></span>
                 <span className="text-gray-300">~60 Minutes</span>
               </div>
               <div className="h-2 w-full bg-gray-900 rounded overflow-hidden">
@@ -610,7 +687,7 @@ export default function Home() {
             {/* Card Settlement */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-indigo-400 font-semibold">Card clearing window (Standard ACH/Wire clearing)</span>
+                <span className="text-indigo-400 font-semibold">Card clearing window (Standard ACH/Wire clearing) <InfoTooltip content="Standard clearance time required by card processors, gateways, and commercial banks to settle accounts." /></span>
                 <span className="text-gray-300">{data.card_rail.finality_time_display}</span>
               </div>
               <div className="h-2 w-full bg-gray-900 rounded overflow-hidden">
@@ -621,7 +698,7 @@ export default function Home() {
             {/* Dispute Vulnerability Window */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-red-400 font-semibold">Card Network dispute/chargeback window (Payment Reversibility)</span>
+                <span className="text-red-400 font-semibold">Card Network dispute/chargeback window (Payment Reversibility) <InfoTooltip content="Merchant exposure to customer chargeback disputes, payment clawbacks, and procedural fees under network guidelines." /></span>
                 <span className="text-gray-300">90 - 120 Days</span>
               </div>
               <div className="h-2 w-full bg-gray-900 rounded overflow-hidden">
@@ -693,10 +770,65 @@ export default function Home() {
 
         {/* FEE COMPARISON TABLE */}
         <div className="rounded-lg border border-[#1F2937] bg-[#0B1117] p-5">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Percent className="h-4 w-4 text-[#38BDF8]" />
-            <span>Scenario Comparison Ledger</span>
-          </h3>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <Percent className="h-4 w-4 text-[#38BDF8]" />
+              <span>Scenario Comparison Ledger</span>
+              <SyntheticBadge tooltip="Ledger scenarios are simulated standard transactions modeled on industry variables." />
+            </h3>
+          </div>
+
+          {/* Interactive Table Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5 p-3 rounded border border-[#1F2937]/60 bg-[#030712]/50 font-mono text-xs">
+            {/* Filter by Amount Category */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Volume Category</span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { id: "all", label: "All Sizes" },
+                  { id: "micro", label: "Micro (<$10)" },
+                  { id: "retail", label: "Retail ($10-$1k)" },
+                  { id: "b2b", label: "B2B (>$1k)" }
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setSizeFilter(item.id as any)}
+                    className={`px-2.5 py-1 text-[10px] rounded transition-all active:scale-95 cursor-pointer ${
+                      sizeFilter === item.id 
+                        ? "bg-[#38BDF8] text-[#030712] font-semibold" 
+                        : "bg-[#0B1117] text-gray-400 hover:text-gray-200 border border-[#1F2937]"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Filter by Most Cost-Effective Rail */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Efficiency Leader</span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { id: "all", label: "All Rails" },
+                  { id: "crypto", label: "Bitcoin/L2 Saves" },
+                  { id: "card", label: "Card Rail Saves" }
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setRailFilter(item.id as any)}
+                    className={`px-2.5 py-1 text-[10px] rounded transition-all active:scale-95 cursor-pointer ${
+                      railFilter === item.id 
+                        ? "bg-[#818CF8] text-[#030712] font-semibold" 
+                        : "bg-[#0B1117] text-gray-400 hover:text-gray-200 border border-[#1F2937]"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono border-collapse">
@@ -704,56 +836,96 @@ export default function Home() {
                 <tr className="border-b border-[#1F2937] text-gray-400">
                   <th className="py-2.5 px-3">Scenario</th>
                   <th className="py-2.5 px-3">Default Txn</th>
-                  <th className="py-2.5 px-3 text-indigo-400">Card Settlement Fee</th>
-                  <th className="py-2.5 px-3 text-[#38BDF8]">On-Chain Fee (Est)</th>
-                  <th className="py-2.5 px-3 text-emerald-400">Total Savings</th>
+                  <th className="py-2.5 px-3 text-indigo-400">Card Settlement Fee <InfoTooltip content="Aggregated interchange, acquirer processing, card network assessments, and gateway flat fees." /></th>
+                  <th className="py-2.5 px-3 text-[#38BDF8]">On-Chain Fee (Est) <InfoTooltip content="On-chain mining fee calculated from transaction virtual weight (vBytes) and priority gas rates." /></th>
+                  <th className="py-2.5 px-3 text-emerald-400">Total Savings <InfoTooltip content="Net fee delta. A positive value shows amount saved when selecting Bitcoin instead of Visa/Mastercard." /></th>
                   <th className="py-2.5 px-3">Primary Efficiency Rail</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/40">
-                {Object.keys(LOCAL_SCENARIOS).map((key) => {
+                {Object.keys(LOCAL_SCENARIOS)
+                  .filter((key) => {
+                    const s = LOCAL_SCENARIOS[key];
+                    
+                    // Size Filter
+                    if (sizeFilter === "micro" && s.default_amount >= 10.0) return false;
+                    if (sizeFilter === "retail" && (s.default_amount < 10.0 || s.default_amount > 1000.0)) return false;
+                    if (sizeFilter === "b2b" && s.default_amount <= 1000.0) return false;
+                    
+                    // Rail efficiency filter
+                    const cCalc = calculateLocalComparison(key, s.default_amount, parseInt(customSatRate) || 25);
+                    const isCryptoCheaper = cCalc.insights.savings_dollars > 0 || key === "micropayment";
+                    if (railFilter === "crypto" && !isCryptoCheaper) return false;
+                    if (railFilter === "card" && isCryptoCheaper) return false;
+                    
+                    return true;
+                  })
+                  .map((key) => {
+                    const s = LOCAL_SCENARIOS[key];
+                    const cCalc = calculateLocalComparison(key, s.default_amount, parseInt(customSatRate) || 25);
+                    const isCurrent = key === useCase;
+                    
+                    return (
+                      <tr 
+                        key={key} 
+                        onClick={() => setUseCase(key)}
+                        className={`hover:bg-gray-800/30 cursor-pointer transition-colors ${
+                          isCurrent ? "bg-[#0b1622] border-l-2 border-[#38BDF8]" : ""
+                        }`}
+                      >
+                        <td className="py-3 px-3 font-semibold text-white flex items-center gap-1.5">
+                          <span>{s.name}</span>
+                          <SyntheticBadge tooltip="Simulated scenario parameter benchmark." />
+                        </td>
+                        <td className="py-3 px-3 text-gray-300">${s.default_amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td className="py-3 px-3 text-indigo-300 font-semibold">
+                          ${cCalc.card_rail.total_fee.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                          <span className="text-[10px] text-gray-500 block">({cCalc.card_rail.fee_percentage.toFixed(2)}%)</span>
+                        </td>
+                        <td className="py-3 px-3 text-cyan-300 font-semibold">
+                          ${cCalc.on_chain_rail.total_fee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4})}
+                          <span className="text-[10px] text-gray-500 block">({cCalc.on_chain_rail.fee_percentage.toFixed(4)}%)</span>
+                        </td>
+                        <td className="py-3 px-3 font-bold text-emerald-400">
+                          {cCalc.insights.savings_dollars > 0 
+                            ? `$${cCalc.insights.savings_dollars.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+                            : `-$${Math.abs(cCalc.insights.savings_dollars).toFixed(2)}`
+                          }
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            key === "micropayment" 
+                              ? "bg-emerald-950/40 text-emerald-400 border border-emerald-800"
+                              : cCalc.insights.savings_dollars > 0 
+                                ? "bg-cyan-950/40 text-cyan-400 border border-cyan-800" 
+                                : "bg-indigo-950/40 text-indigo-400 border border-indigo-800"
+                          }`}>
+                            {key === "micropayment" ? "Lightning (L2)" : cCalc.insights.savings_dollars > 0 ? "Bitcoin On-Chain" : "Card Rails"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                {/* Empty State */}
+                {Object.keys(LOCAL_SCENARIOS).filter((key) => {
                   const s = LOCAL_SCENARIOS[key];
-                  const cCalc = calculateLocalComparison(key, s.default_amount, parseInt(customSatRate) || 25);
-                  const isCurrent = key === useCase;
+                  if (sizeFilter === "micro" && s.default_amount >= 10.0) return false;
+                  if (sizeFilter === "retail" && (s.default_amount < 10.0 || s.default_amount > 1000.0)) return false;
+                  if (sizeFilter === "b2b" && s.default_amount <= 1000.0) return false;
                   
-                  return (
-                    <tr 
-                      key={key} 
-                      onClick={() => setUseCase(key)}
-                      className={`hover:bg-gray-800/30 cursor-pointer transition-colors ${
-                        isCurrent ? "bg-[#0b1622] border-l-2 border-[#38BDF8]" : ""
-                      }`}
-                    >
-                      <td className="py-3 px-3 font-semibold text-white">{s.name}</td>
-                      <td className="py-3 px-3 text-gray-300">${s.default_amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                      <td className="py-3 px-3 text-indigo-300 font-semibold">
-                        ${cCalc.card_rail.total_fee.toLocaleString(undefined, {minimumFractionDigits: 2})}
-                        <span className="text-[10px] text-gray-500 block">({cCalc.card_rail.fee_percentage.toFixed(2)}%)</span>
-                      </td>
-                      <td className="py-3 px-3 text-cyan-300 font-semibold">
-                        ${cCalc.on_chain_rail.total_fee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4})}
-                        <span className="text-[10px] text-gray-500 block">({cCalc.on_chain_rail.fee_percentage.toFixed(4)}%)</span>
-                      </td>
-                      <td className="py-3 px-3 font-bold text-emerald-400">
-                        {cCalc.insights.savings_dollars > 0 
-                          ? `$${cCalc.insights.savings_dollars.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
-                          : `-$${Math.abs(cCalc.insights.savings_dollars).toFixed(2)}`
-                        }
-                      </td>
-                      <td className="py-3 px-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          key === "micropayment" 
-                            ? "bg-emerald-950/40 text-emerald-400 border border-emerald-800"
-                            : cCalc.insights.savings_dollars > 0 
-                              ? "bg-cyan-950/40 text-cyan-400 border border-cyan-800" 
-                              : "bg-indigo-950/40 text-indigo-400 border border-indigo-800"
-                        }`}>
-                          {key === "micropayment" ? "Lightning (L2)" : cCalc.insights.savings_dollars > 0 ? "Bitcoin On-Chain" : "Card Rails"}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                  const cCalc = calculateLocalComparison(key, s.default_amount, parseInt(customSatRate) || 25);
+                  const isCryptoCheaper = cCalc.insights.savings_dollars > 0 || key === "micropayment";
+                  if (railFilter === "crypto" && !isCryptoCheaper) return false;
+                  if (railFilter === "card" && isCryptoCheaper) return false;
+                  
+                  return true;
+                }).length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-gray-500 font-mono text-xs uppercase">
+                      No scenarios match the selected filters.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -861,11 +1033,25 @@ export default function Home() {
             <div className="space-y-1">
               <div className="flex justify-between items-center">
                 <label className="text-[10px] font-mono text-gray-400 uppercase">Bitcoin gas rate (sat/vB)</label>
-                {liveBtcStats?.is_live && (
-                  <span className="text-[10px] font-mono text-[#38BDF8] flex items-center gap-0.5">
-                    <span className="inline-block w-1.5 h-1.5 bg-[#38BDF8] rounded-full animate-ping"></span>
-                    <span>Live Recommended: {liveBtcStats.sat_per_vbyte}</span>
-                  </span>
+                {liveBtcStats?.is_live ? (
+                  <a 
+                    href="https://mempool.space" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-[9px] font-mono text-[#38BDF8] hover:underline flex items-center gap-1"
+                  >
+                    <span className="inline-block w-1.5 h-1.5 bg-[#38BDF8] rounded-full animate-pulse"></span>
+                    <span>Live fee: {liveBtcStats.sat_per_vbyte} (mempool.space)</span>
+                  </a>
+                ) : (
+                  <a 
+                    href="https://mempool.space" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-[9px] font-mono text-gray-500 hover:text-gray-300 hover:underline"
+                  >
+                    mempool.space API offline
+                  </a>
                 )}
               </div>
               <input 
