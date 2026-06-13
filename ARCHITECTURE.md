@@ -66,7 +66,7 @@ The frontend is constructed using **Next.js** (v16.2.7), utilizing **React 19** 
 
 ### Core Frontend Components & Mechanics
 1.  **Dual-Engine Calculations**:
-    *   On mounting, the client attempts to establish a connection with the backend (`http://localhost:8000`).
+    *   On mounting, the client attempts to establish a connection with the backend (URL configured via the `NEXT_PUBLIC_API_URL` environment variable, defaulting to `http://localhost:8000`).
     *   If the backend is reachable, the application relies on the FastAPI server to perform calculations and fetch live BTC exchange rates.
     *   If the backend is unreachable, the client activates its built-in **Local Calculation Engine**. This module replicates the Pandas logic entirely in JavaScript using local constants, providing a zero-downtime failover model.
 2.  **State Management**:

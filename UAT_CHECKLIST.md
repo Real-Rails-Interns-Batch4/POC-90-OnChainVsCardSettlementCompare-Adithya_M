@@ -6,7 +6,7 @@ This checklist is designed for stakeholders to test and sign off on the features
 
 ## 📋 How to Conduct UAT
 
-1.  Start the FastAPI backend (`python main.py` in `backend` folder).
+1.  Start the FastAPI backend (`uvicorn main:app --reload` in `backend` folder).
 2.  Start the Next.js development server (`npm run dev` in `frontend` folder).
 3.  Open the web application at `http://localhost:8080` in your browser.
 4.  Follow the verification checklist below, checking off items as they pass.

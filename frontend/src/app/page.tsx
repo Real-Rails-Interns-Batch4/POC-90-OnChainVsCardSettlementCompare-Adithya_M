@@ -7,9 +7,7 @@ import {
   HelpCircle, 
   Users, 
   ShieldAlert, 
-  ArrowRight, 
   Download, 
-  Server, 
   Globe, 
   Layers, 
   Percent, 
@@ -18,8 +16,10 @@ import {
   Info,
   TrendingDown
 } from "lucide-react";
-import ReactFlow, { Background, Controls, Edge, Node } from "reactflow";
+import ReactFlow, { Background, Edge, Node } from "reactflow";
 import "reactflow/dist/style.css";
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // --- CUSTOM TOOLTIP & BADGE COMPONENTS ---
 function InfoTooltip({ content }: { content: string }) {
@@ -68,6 +68,7 @@ function SyntheticBadge({ tooltip }: { tooltip?: string }) {
 }
 
 // --- LOCAL FALLBACK DATA & CALCULATIONS (Extreme Durability Guardrail) ---
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const LOCAL_SCENARIOS: Record<string, any> = {
   retail: {
     id: "retail",
@@ -196,7 +197,7 @@ function calculateLocalComparison(useCase: string, amt: number, customSatRate?: 
   // Insights
   const savings = total_card_fee - total_btc_fee;
   const cost_insight = savings > 0 
-    ? `On-Chain Bitcoin saves $${savings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} in fees compared to Card Settlement (${btc_fee_pct.toFixed(3)}% vs {card_fee_pct.toFixed(3)}%).`
+    ? `On-Chain Bitcoin saves $${savings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} in fees compared to Card Settlement (${btc_fee_pct.toFixed(3)}% vs ${card_fee_pct.toFixed(3)}%).`
     : `Card Rail is $${(-savings).toFixed(2)} cheaper than On-Chain due to high network fee rate relative to amount (Card: ${card_fee_pct.toFixed(2)}% vs On-Chain: ${btc_fee_pct.toFixed(2)}%). For sub-dollar scenarios, Layer-2 Lightning settlement is recommended.`;
   
   return {
@@ -279,11 +280,13 @@ export default function Home() {
   
   // Real-time API States
   const [liveBtcStats, setLiveBtcStats] = useState<{ sat_per_vbyte: number; btc_price_usd: number; is_live: boolean } | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>(null);
   const [flowTab, setFlowTab] = useState<"card" | "btc">("card");
 
   // Prevent SSR Hydration Issues
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -291,7 +294,7 @@ export default function Home() {
   useEffect(() => {
     const fetchMempool = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/mempool");
+        const res = await fetch(`${BACKEND_URL}/api/mempool`);
         if (res.ok) {
           const stats = await res.json();
           setLiveBtcStats(stats);
@@ -300,10 +303,11 @@ export default function Home() {
           }
         }
       } catch (err) {
-        console.warn("FastAPI backend not running or unreachable. Auto-switching to mock data failover.");
+        console.warn("FastAPI backend not running or unreachable. Auto-switching to mock data failover.", err);
       }
     };
     fetchMempool();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Recalculate or Fetch Compare Data whenever parameters change
@@ -313,7 +317,7 @@ export default function Home() {
       const satParam = customSatRate ? parseInt(customSatRate) : (liveBtcStats?.sat_per_vbyte || 25);
       
       try {
-        const url = `http://localhost:8000/api/compare?use_case=${useCase}&amount=${amtParam}&sat_rate=${satParam}`;
+        const url = `${BACKEND_URL}/api/compare?use_case=${useCase}&amount=${amtParam}&sat_rate=${satParam}`;
         const res = await fetch(url);
         if (res.ok) {
           const fetchedData = await res.json();
@@ -323,6 +327,7 @@ export default function Home() {
           throw new Error("Backend non-ok response");
         }
       } catch (err) {
+        console.warn("Backend sync failed. Using local calculation fallback:", err);
         // FAILOVER
         setIsLiveBackend(false);
         const calc = calculateLocalComparison(useCase, amtParam, satParam);
@@ -351,7 +356,7 @@ export default function Home() {
     
     if (isLiveBackend) {
       // Direct Download from API
-      window.open(`http://localhost:8000/api/export?use_case=${useCase}&amount=${amtParam}&sat_rate=${satParam}`, "_blank");
+      window.open(`${BACKEND_URL}/api/export?use_case=${useCase}&amount=${amtParam}&sat_rate=${satParam}`, "_blank");
     } else {
       // Local CSV generation fallback
       const headers = ["Parameter", "Card Settlement", "Bitcoin On-Chain"];
@@ -784,15 +789,17 @@ export default function Home() {
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Volume Category</span>
               <div className="flex flex-wrap gap-1.5">
-                {[
-                  { id: "all", label: "All Sizes" },
-                  { id: "micro", label: "Micro (<$10)" },
-                  { id: "retail", label: "Retail ($10-$1k)" },
-                  { id: "b2b", label: "B2B (>$1k)" }
-                ].map((item) => (
+                {(
+                  [
+                    { id: "all", label: "All Sizes" },
+                    { id: "micro", label: "Micro (<$10)" },
+                    { id: "retail", label: "Retail ($10-$1k)" },
+                    { id: "b2b", label: "B2B (>$1k)" }
+                  ] as const
+                ).map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setSizeFilter(item.id as any)}
+                    onClick={() => setSizeFilter(item.id)}
                     className={`px-2.5 py-1 text-[10px] rounded transition-all active:scale-95 cursor-pointer ${
                       sizeFilter === item.id 
                         ? "bg-[#38BDF8] text-[#030712] font-semibold" 
@@ -809,14 +816,16 @@ export default function Home() {
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Efficiency Leader</span>
               <div className="flex flex-wrap gap-1.5">
-                {[
-                  { id: "all", label: "All Rails" },
-                  { id: "crypto", label: "Bitcoin/L2 Saves" },
-                  { id: "card", label: "Card Rail Saves" }
-                ].map((item) => (
+                {(
+                  [
+                    { id: "all", label: "All Rails" },
+                    { id: "crypto", label: "Bitcoin/L2 Saves" },
+                    { id: "card", label: "Card Rail Saves" }
+                  ] as const
+                ).map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setRailFilter(item.id as any)}
+                    onClick={() => setRailFilter(item.id)}
                     className={`px-2.5 py-1 text-[10px] rounded transition-all active:scale-95 cursor-pointer ${
                       railFilter === item.id 
                         ? "bg-[#818CF8] text-[#030712] font-semibold" 

@@ -131,7 +131,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Run the FastAPI server
-python main.py
+uvicorn main:app --reload
 ```
 
 The FastAPI backend will start running locally at **`http://127.0.0.1:8000`**.
