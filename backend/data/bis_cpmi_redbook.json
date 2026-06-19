@@ -1,0 +1,102 @@
+{
+  "title": "BIS CPMI Red Book Statistics (Retail Payments)",
+  "source": "Bank for International Settlements (BIS)",
+  "last_updated": "2024-12",
+  "jurisdictions": [
+    {
+      "country": "United States",
+      "cashless_payments_per_inhabitant": {
+        "2020": 455.2,
+        "2021": 482.7,
+        "2022": 508.3
+      },
+      "cash_in_circulation_pct_gdp": {
+        "2020": 9.2,
+        "2021": 8.9,
+        "2022": 8.6
+      },
+      "instrument_shares_pct_volume": {
+        "cards": 73.5,
+        "credit_transfers": 15.2,
+        "direct_debits": 10.3,
+        "checks": 1.0
+      }
+    },
+    {
+      "country": "United Kingdom",
+      "cashless_payments_per_inhabitant": {
+        "2020": 320.1,
+        "2021": 365.4,
+        "2022": 395.1
+      },
+      "cash_in_circulation_pct_gdp": {
+        "2020": 4.1,
+        "2021": 3.7,
+        "2022": 3.2
+      },
+      "instrument_shares_pct_volume": {
+        "cards": 63.2,
+        "credit_transfers": 18.5,
+        "direct_debits": 16.8,
+        "checks": 1.5
+      }
+    },
+    {
+      "country": "Euro Area",
+      "cashless_payments_per_inhabitant": {
+        "2020": 178.5,
+        "2021": 195.2,
+        "2022": 218.4
+      },
+      "cash_in_circulation_pct_gdp": {
+        "2020": 11.8,
+        "2021": 11.5,
+        "2022": 10.9
+      },
+      "instrument_shares_pct_volume": {
+        "cards": 53.4,
+        "credit_transfers": 24.2,
+        "direct_debits": 21.6,
+        "checks": 0.8
+      }
+    },
+    {
+      "country": "Japan",
+      "cashless_payments_per_inhabitant": {
+        "2020": 102.4,
+        "2021": 114.8,
+        "2022": 128.9
+      },
+      "cash_in_circulation_pct_gdp": {
+        "2020": 22.5,
+        "2021": 22.1,
+        "2022": 21.8
+      },
+      "instrument_shares_pct_volume": {
+        "cards": 32.1,
+        "credit_transfers": 58.6,
+        "direct_debits": 9.1,
+        "checks": 0.2
+      }
+    },
+    {
+      "country": "Singapore",
+      "cashless_payments_per_inhabitant": {
+        "2020": 348.9,
+        "2021": 381.2,
+        "2022": 412.5
+      },
+      "cash_in_circulation_pct_gdp": {
+        "2020": 10.1,
+        "2021": 9.5,
+        "2022": 8.4
+      },
+      "instrument_shares_pct_volume": {
+        "cards": 48.6,
+        "credit_transfers": 30.2,
+        "direct_debits": 11.2,
+        "checks": 10.0
+      }
+    }
+  ]
+}

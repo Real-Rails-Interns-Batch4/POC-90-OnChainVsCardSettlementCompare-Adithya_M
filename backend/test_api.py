@@ -32,12 +32,30 @@ def test_export():
     assert response.headers["Content-Disposition"].startswith("attachment")
     print("Export CSV success, headers:", response.headers)
 
+def test_ingest():
+    response = client.get("/api/ingest")
+    assert response.status_code == 200
+    data = response.json()
+    assert "mempool_stats" in data
+    assert "federal_reserve_payments_study" in data
+    assert "bis_cpmi_redbook" in data
+    print("Ingest GET success. Last ingested:", data.get("last_ingested_timestamp"))
+
+def test_ingest_refresh():
+    response = client.post("/api/ingest/refresh")
+    assert response.status_code == 200
+    data = response.json()
+    assert "mempool_stats" in data
+    print("Ingest POST refresh success.")
+
 if __name__ == "__main__":
     print("Starting FastAPI Local Tests...")
     try:
         test_mempool()
         test_compare()
         test_export()
+        test_ingest()
+        test_ingest_refresh()
         print("\nSUCCESS: All backend tests passed successfully!")
     except Exception as e:
         print("\nFAILURE: Backend test failed!", str(e))

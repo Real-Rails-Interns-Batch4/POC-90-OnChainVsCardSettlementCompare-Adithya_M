@@ -2,10 +2,11 @@ import os
 import json
 import pandas as pd
 import requests
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 import io
+from ingest_data import run_ingestion_pipeline, SUMMARY_PATH
 
 app = FastAPI(title="Real Rails: On-Chain vs Card Settlement Intelligence")
 
@@ -265,6 +266,30 @@ def export_comparison_csv(
     )
     response.headers["Content-Disposition"] = f"attachment; filename=settlement_compare_{use_case}.csv"
     return response
+
+@app.get("/api/ingest")
+def get_ingested_data():
+    """Retrieve Consolidated Ingested Data (mempool.space, Fed Study, BIS Red Book)"""
+    if not os.path.exists(SUMMARY_PATH):
+        # Run pipeline if summary cache does not exist
+        data = run_ingestion_pipeline()
+        if not data:
+            raise HTTPException(status_code=500, detail="Failed to run data ingestion pipeline.")
+        return data
+    
+    try:
+        with open(SUMMARY_PATH, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load ingested data: {str(e)}")
+
+@app.post("/api/ingest/refresh")
+def refresh_ingested_data():
+    """Trigger a refresh of the ingestion pipeline to get live and latest stats"""
+    data = run_ingestion_pipeline()
+    if not data:
+        raise HTTPException(status_code=500, detail="Failed to refresh data ingestion pipeline.")
+    return data
 
 if __name__ == "__main__":
     import uvicorn

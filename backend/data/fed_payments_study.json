@@ -1,0 +1,35 @@
+{
+  "title": "Federal Reserve Payments Study (Historical)",
+  "source": "Federal Reserve System",
+  "last_updated": "2023-12",
+  "historical_data": [
+    {
+      "year": 2012,
+      "credit_card": { "volume_billions": 26.2, "value_trillions": 2.26 },
+      "debit_card": { "volume_billions": 47.0, "value_trillions": 1.72 },
+      "ach": { "volume_billions": 22.0, "value_trillions": 63.70 },
+      "check": { "volume_billions": 19.6, "value_trillions": 25.90 }
+    },
+    {
+      "year": 2015,
+      "credit_card": { "volume_billions": 33.8, "value_trillions": 2.95 },
+      "debit_card": { "volume_billions": 59.6, "value_trillions": 2.19 },
+      "ach": { "volume_billions": 24.9, "value_trillions": 76.80 },
+      "check": { "volume_billions": 16.6, "value_trillions": 24.70 }
+    },
+    {
+      "year": 2018,
+      "credit_card": { "volume_billions": 44.7, "value_trillions": 3.98 },
+      "debit_card": { "volume_billions": 82.6, "value_trillions": 3.29 },
+      "ach": { "volume_billions": 28.5, "value_trillions": 97.20 },
+      "check": { "volume_billions": 12.8, "value_trillions": 23.30 }
+    },
+    {
+      "year": 2021,
+      "credit_card": { "volume_billions": 51.1, "value_trillions": 4.76 },
+      "debit_card": { "volume_billions": 109.0, "value_trillions": 4.56 },
+      "ach": { "volume_billions": 31.0, "value_trillions": 113.88 },
+      "check": { "volume_billions": 11.2, "value_trillions": 20.30 }
+    }
+  ]
+}
